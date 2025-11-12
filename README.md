@@ -1,103 +1,174 @@
-TOPSIS Analysis for Ranking Plant-Parasitic Nematode Treatments
-This project provides a Python script for TOPSIS (Technique for Order of Preference by Similarity to Ideal Solution), a multi-criteria decision-making (MCDM) method.
+📘 README — TOPSIS Analysis for Ranking Plant-Parasitic Nematode Treatments
+📖 Overview
+This project implements a full TOPSIS (Technique for Order of Preference by Similarity to Ideal Solution) analysis for ranking experimental treatments used against plant-parasitic nematodes such as Meloidogyne javanica.
 
-This script is specifically configured to analyze experimental data for ranking the efficacy of various treatments (such as organic amendments, bioproducts, or chemical controls) against plant-parasitic nematodes (like Meloidogyne javanica). It evaluates treatments based on multiple criteria—such as nematode reproduction indices and plant growth parameters—to generate a single, comprehensive "composite score" for ranking.
+It provides a transparent, reproducible, and flexible framework for determining which treatments (organic amendments, bioproducts, or chemical controls) perform best based on multiple biological and plant growth criteria.
 
 🚀 Features
-Full TOPSIS Implementation: Calculates the normalized decision matrix, weighted normalized matrix, Positive Ideal Solution (PIS), Negative Ideal Solution (NIS), and the final relative closeness (Ci) score.
+Full TOPSIS Implementation:
 
-Reads from Excel: Directly ingests data from a specified Input.xlsx file and sheet.
+Normalization of the decision matrix
+Weighted normalization
+Computation of Positive Ideal Solution (PIS) and Negative Ideal Solution (NIS)
+Calculation of the final composite score (Ci) and ranking
+Excel-based Input:
 
-Easy Configuration: All inputs, outputs, and trait definitions are centralized in a configuration block at the top of the script.
+Reads raw data, weights, and directions directly from a single Excel file.
+Configurable:
 
-Automatic Weight & Direction: Reads the weight (importance) and direction (benefit/cost) for each criterion directly from the input Excel file.
+Central configuration block for all paths, sheet names, and criteria mappings.
+Automatic Weight & Direction Detection:
 
-Benefit (+): Criteria to be maximized (e.g., 'SFW', 'SDW', 'SL').
-
-Cost (-): Criteria to be minimized (e.g., 'Eggs', 'Galls', 'Egg Masses', 'RF').
-
-Equal Weighting Fallback: If no weight columns are provided, the script automatically assigns equal weights to all criteria.
-
+Reads weight and benefit/cost direction from the Excel file.
+Defaults to equal weights when not specified.
 Comprehensive Outputs:
 
-.xlsx file: A multi-sheet Excel file with the full ranked results and a separate sheet detailing the final weights and directions used in the analysis.
+.xlsx: Detailed results and weights
+.txt: Tab-delimited summary
+.png: High-quality bar plot of ranked treatments
+Case-Insensitive Column Detection:
 
-.txt file: A tab-separated text file of the primary results for easy import into other software.
-
-.png plot: A publication-quality horizontal bar chart visualizing the composite scores, sorted from best to worst.
-
-Case-Insensitive: Automatically finds column names (e.g., "Treatment") regardless of capitalization.
-
+Automatically recognizes treatment and criterion columns regardless of capitalization.
+🧩 Criteria Types
+Benefit (“+”) Criteria: Higher values are better
+Examples: SFW, SDW, SL
+Cost (“–”) Criteria: Lower values are better
+Examples: Eggs, Galls, Egg Masses, RF
 🛠️ Requirements
-The script requires the following Python libraries. You can install them all using the requirements.txt file (if provided) or individually.
+Install dependencies using:
+
+
+content_copy
+text
+pip install pandas numpy matplotlib seaborn openpyxl
+Required Python Packages:
 
 pandas
-
 numpy
-
 matplotlib
-
 seaborn
+openpyxl
+⚙️ Configuration
+Modify these variables at the top of the script before running:
 
-openpyxl (for reading/writing .xlsx files)
 
-Installation:
+content_copy
+python
 
-Bash
-
-pip install pandas numpy matplotlib seaborn openpyxl
-⚙️ How to Use
-Install Requirements:
-
-Bash
-
-pip install pandas numpy matplotlib seaborn openpyxl
-Prepare the Input.xlsx file: Your data file must be structured correctly.
-
-Treatment Column: A column listing the names of each treatment (e.g., 'Untreated Control', 'Tervigo', 'Fish Bone Meal 4%', 'B. subtilis').
-
-Value Columns: Columns for the data of each criterion (e.g., RF, Eggs, Gall, SDW, SFW). The names must match the keys in the TRAITS_RAW dictionary.
-
-Weight Columns: (Optional) Columns for the weight of each criterion (e.g., RF-wgt, Eggs-wgt). This is typically a constant number down the entire column.
-
-Direction Columns: Columns for the goal of each criterion (e.g., RF-drc, Eggs-drc). This column should contain either:
-
-+ for benefit criteria (higher is better, e.g., 'SFW' - Shoot Fresh Weight).
-
-- for cost criteria (lower is better, e.g., 'Galls' or 'RF' - Reproduction Factor).
-
-Configure the Script: Open the Python (.py) file and edit the Configuration section at the top.
-
-IN_PATH: The file path to your Input.xlsx file.
-
-SHEET_NAME: The name of the sheet in the Excel file that contains your data.
-
-OUT_DIR: The path to the folder where all output files will be saved.
-
-TRAITS_RAW: This is the most important part. Define all your criteria here, mapping the trait name to its corresponding weight and direction columns in the Excel file.
-
-⚠️ Important: The script uses absolute paths (e.g., G:\...). This will not work on any other computer. It is highly recommended to use relative paths.
-
-Example (Recommended): Create a data folder for your input and an output folder for your results.
-
-Python
-
+note_add
+ویرایش با Canvas
+# Example Configuration
 IN_PATH = "data/Input.xlsx"
+SHEET_NAME = "Sheet1"
 OUT_DIR = "output/v1_results"
-Run the Script:
 
-Bash
+# Define trait names, their weights, and directions
+TRAITS_RAW = {
+    "RF": {"weight_col": "RF-wgt", "direction_col": "RF-drc"},
+    "Eggs": {"weight_col": "Eggs-wgt", "direction_col": "Eggs-drc"},
+    "Galls": {"weight_col": "Galls-wgt", "direction_col": "Galls-drc"},
+    "SFW": {"weight_col": "SFW-wgt", "direction_col": "SFW-drc"},
+    "SDW": {"weight_col": "SDW-wgt", "direction_col": "SDW-drc"},
+}
+📌 Important:
 
-python your_script_name.py
-📊 Outputs
-After running, the following files will be created in your specified OUT_DIR:
+Use relative paths (not absolute paths) to keep the project portable.
 
-scored_results.xlsx:
+Recommended project structure:
 
-Sheet 'Results': Contains the Treatment, composite_score, rank, and all normalized/weighted values for each criterion.
 
-Sheet 'Weights': A summary of the final weights and directions applied to each trait.
+content_copy
+text
+├── data/
+│   └── Input.xlsx
+├── output/
+│   ├── scored_results.xlsx
+│   ├── scored_results.txt
+│   └── composite_scores.png
+└── TOPSIS_analysis.py
+📂 Input File Structure
+Your Excel input (Input.xlsx) should contain:
 
-scored_results.txt: A tab-delimited text version of the 'Results' sheet, ideal for quick review or data import.
+| Treatment | RF | Eggs | Galls | SDW | SFW | RF-wgt | RF-drc | … |
 
-composite_scores.png: A high-DPI (600 dpi) horizontal bar plot showing the final composite_score for each treatment, sorted in descending order (best treatment at the top).
+|------------|----|-------|--------|------|------|----------|---------|
+
+| Control | 10.5 | 5200 | 75 | 1.2 | 3.0 | 1 | - | … |
+
+| Tervigo | 6.0 | 2000 | 20 | 2.1 | 4.0 | 1 | - | … |
+
+| Fish Bone 4% | 8.0 | 3000 | 45 | 1.8 | 3.8 | 1 | - | … |
+
+▶️ How to Run
+Install dependencies
+
+content_copy
+text
+   pip install pandas numpy matplotlib seaborn openpyxl
+Run the analysis
+
+content_copy
+text
+   python TOPSIS_analysis.py
+Check outputs in the folder specified by OUT_DIR.
+📊 Output Files
+File	Description
+scored_results.xlsx	Full ranked results (sheet: Results) and applied weights/directions (sheet: Weights)
+scored_results.txt	Main results in tab-delimited text format
+composite_scores.png	Sorted horizontal bar chart of final composite (Ci) scores
+🧮 Method Summary (TOPSIS Steps)
+Normalization of decision matrix
+Weighted normalization using provided or equal weights
+Determination of PIS and NIS
+Distance calculation from ideal and anti-ideal points
+Relative closeness (Ci) computation:
+𝐶
+𝑖
+=
+𝐷
+𝑖
+−
+𝐷
+𝑖
++
++
+𝐷
+𝑖
+−
+C 
+i
+​
+ = 
+D 
+i
++
+​
+ +D 
+i
+−
+​
+ 
+D 
+i
+−
+​
+ 
+​
+ 
+Ranking based on descending C_i values (higher = better treatment)
+📈 Visualization
+The script automatically generates a publication-quality horizontal bar chart (composite_scores.png) showing the treatments ranked from best to worst based on their composite scores.
+
+🧾 Citation
+If you use this script or its methodology in academic work, please cite it as:
+
+TOPSIS Analysis for Ranking Plant-Parasitic Nematode Treatments (2025).
+
+Python implementation and documentation by [Your Name or Organization].
+
+📫 Author & Contact
+Developed by: Arash Noshadi
+
+Contact: Nowshadiarash@gmail.com
+
+License: MIT License
