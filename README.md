@@ -81,3 +81,12 @@ After running, the following files will be created in your specified `OUT_DIR`:
   - **Sheet 'Weights'**: A summary of the final weights and directions applied to each trait.
 - **scored_results.txt**: A tab-delimited text version of the 'Results' sheet, ideal for quick review or data import.
 - **composite_scores.png**: A high-DPI (600 dpi) horizontal bar plot showing the final composite_score for each treatment, sorted in descending order (best treatment at the top).
+
+## 📫 Author & Contact
+- **Developed by**: Arash Noshadi
+
+-**Contact**: Nowshadiarash@gmail.com
+
+*License: MIT License*
+
+*Doi*: ****
