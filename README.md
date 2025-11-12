@@ -85,7 +85,7 @@ After running, the following files will be created in your specified `OUT_DIR`:
 ## 📫 Author & Contact
 - **Developed by**: Arash Noshadi
 
--**Contact**: Nowshadiarash@gmail.com
+- **Contact**: Nowshadiarash@gmail.com
 
 *License: MIT License*
 
