@@ -23,9 +23,9 @@ import seaborn as sns
 #     Only edit this section for each new project
 # ============================================================
 
-IN_PATH    = r"C:\Users\a.noshadi\Desktop\Bonza_Chicko_Bromandnia\All_Data2.xlsx"   # Path to input Excel file
+IN_PATH    = r"C:\Users\a.noshadi\4.xlsx"   # Path to input Excel file
 SHEET_NAME = "Sheet1"        # Sheet name in the Excel file
-OUT_DIR    = r"C:\Users\a.noshadi\Desktop\Bonza_Chicko_Bromandnia\Topsis"       # Output directory
+OUT_DIR    = r"C:\Users\a.noshadi\4"       # Output directory
 
 OUT_TXT   = "scored_results.txt"
 OUT_EXCEL = "scored_results.xlsx"
@@ -37,7 +37,7 @@ OUT_PLOT_HEATMAP  = "topsis_heatmap.png"
 
 alpha = 0.70  # (Subjective)
 beta  = 0.30  # (Objective)
-REFERENCE_TREATMENTS = ["Nadd_Recom"]
+REFERENCE_TREATMENTS = ["Control"]
 # ============================================================
 
 # ------------------------------------------------------------
@@ -66,26 +66,32 @@ def read_structured_excel(path: str, sheet: str):
 
     return col_names, weight_row, direction_row, data_df
 
-def parse_direction(raw_dir: str) -> str | None:
+def parse_direction(raw_dir: str) -> str | float | None:
     """
     Parses direction string:
       '+' or 'positive' → '+'
       '-' or 'negative' → '-'
-      'N/A', 'NA', 'none', '' → 'TARGET' (Nominal-the-best)
+      'N/A', 'NA', 'none', '' → 'TARGET' (Mean of references)
+      Number (e.g., '3', '200') → Returns the float number (Fixed Target)
     """
     d = str(raw_dir).strip().upper()
     
-    # تغییر جدید: به جای None خروجی TARGET می‌دهد
+    # 1. بررسی حالت N/A (وابسته به تیمار مرجع)
     if d in ("N/A", "NA", "NONE", "NAN", ""):
         return "TARGET"  
         
+    # 2. بررسی حالت‌های مثبت و منفی
     if d.startswith("+") or d == "POSITIVE" or d == "P":
         return "+"
     if d.startswith("-") or d == "NEGATIVE" or d == "N":
         return "-"
         
-    return None
-
+    # 3. بررسی حالت جدید: آیا ورودی یک عدد ثابت (مثل 3 یا 200) است؟
+    try:
+        val = float(raw_dir)
+        return val
+    except ValueError:
+        return None
 
 def calculate_shannon_entropy_weights(X: np.ndarray) -> np.ndarray:
     X_pos = X.copy().astype(float)
@@ -193,29 +199,33 @@ def main():
     for j, t in enumerate(traits):
         X[:, j] = data_df[t].values
 
-    # اعمال منطق ویژگی‌های N/A (Target-is-best) بر اساس تیمارهای مرجع
+    # اعمال منطق ویژگی‌های هدف‌گرا (N/A یا یک عدد ثابت)
     for j, t in enumerate(traits):
-        if directions[t] == "TARGET":
+        dir_val = directions[t]
+        
+        # اگر جهت N/A باشد (TARGET) یا کاربر یک عدد ثابت (float) وارد کرده باشد
+        if dir_val == "TARGET" or isinstance(dir_val, float):
             
-            # پیدا کردن ردیف‌های مربوط به تیمارهای مرجع
-            if REFERENCE_TREATMENTS:
-                ref_data = data_df[data_df[treat_col].isin(REFERENCE_TREATMENTS)]
-                
-                # اگر نام‌های وارد شده در لیست پیدا نشدند، هشدار بده و از میانگین کل استفاده کن
-                if len(ref_data) == 0:
-                    print(f"  [WARNING] None of {REFERENCE_TREATMENTS} found. Using mean of ALL treatments for '{t}'.")
-                    T_j = np.mean(X[:, j])
+            if dir_val == "TARGET":
+                # حالت اول: محاسبه هدف بر اساس میانگین تیمار(های) مرجع
+                if REFERENCE_TREATMENTS:
+                    ref_data = data_df[data_df[treat_col].isin(REFERENCE_TREATMENTS)]
+                    if len(ref_data) == 0:
+                        T_j = np.mean(X[:, j])
+                    else:
+                        T_j = ref_data[t].mean()
                 else:
-                    # میانگین فقط برای تیمارهای مشخص شده
-                    T_j = ref_data[t].mean()
+                    T_j = np.mean(X[:, j])
             else:
-                T_j = np.mean(X[:, j])
+                # حالت دوم: استفاده از عدد ثابتِ فیزیولوژیک به عنوان هدف (مثل 3 یا 200)
+                T_j = dir_val
             
-            # تبدیل داده‌ها به قدر مطلق فاصله از هدف تعیین شده
+            # تبدیل داده‌ها به قدر مطلق فاصله از عدد هدف
             X[:, j] = np.abs(X[:, j] - T_j)
             
-            # تغییر جهت به ویژگی منفی (-) تا هرچه فاصله کمتر باشد، رتبه بهتری بگیرد
+            # تغییر جهت به ویژگی منفی (-) تا هرچه فاصله از هدف کمتر باشد، امتیاز بهتر شود
             directions[t] = "-"
+    
     # ── 5. AHP (subjective) weights ────────────────────────
 
     ahp_arr = np.array([ahp_w_raw[t] for t in traits], dtype=float)
