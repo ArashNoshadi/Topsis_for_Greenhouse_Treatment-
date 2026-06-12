@@ -1,6 +1,6 @@
-## Agricultural Decision using TOPSIS(AgroDT)
+# Agricultural Decision using TOPSIS(AgroDT)
 
-# Hybrid TOPSIS Analysis for Ranking Plant-Parasitic Nematode Treatments
+## Hybrid TOPSIS Analysis for Ranking Plant-Parasitic Nematode Treatments
 
 This project provides a robust Python implementation of **TOPSIS** (Technique for Order of Preference by Similarity to Ideal Solution), enhanced with a **Hybrid Weighting System**.
 
