@@ -93,14 +93,6 @@ Upon execution, the script generates three files in your output directory:
 2.  **`scored_results.txt`**: A tab-separated text file of the main results for easy import into other statistical software (SAS, SPSS, R).
 3.  **`composite_scores.png`**: A professional horizontal bar chart visualizing the treatment rankings, sorted from best to worst.
 
-## 📝 Methodology Brief
-
-The final weight ($W_j$) for each trait is calculated as:
-
-$$ W_{final_j} = \frac{W_{AHP_j} \times W_{Shannon_j} \times \frac{1}{1 + Error_j}}{\sum (W_{AHP} \times W_{Shannon} \times \frac{1}{1 + Error})} $$
-
-This ensures that the final ranking respects expert opinion, data structure, and model reliability simultaneously.
-
 ## 📫 Author & Contact
 
   - **Developed by**: Arash Noshadi
